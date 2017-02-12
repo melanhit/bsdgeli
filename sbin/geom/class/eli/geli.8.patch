@@ -1,0 +1,33 @@
+Index: sbin/geom/class/eli/geli.8
+===================================================================
+--- sbin/geom/class/eli/geli.8	(revision 313496)
++++ sbin/geom/class/eli/geli.8	(working copy)
+@@ -172,7 +172,9 @@
+ .Nm AES-XTS ,
+ .Nm AES-CBC ,
+ .Nm Blowfish-CBC ,
+-.Nm Camellia-CBC
++.Nm Camellia-CBC ,
++.Nm Threefish-CBC ,
++.Nm Threefish-XTS
+ and
+ .Nm 3DES-CBC ) .
+ .It
+@@ -286,6 +288,8 @@
+ .Nm AES-CBC ,
+ .Nm Blowfish-CBC ,
+ .Nm Camellia-CBC ,
++.Nm Threefish-CBC ,
++.Nm Threefish-XTS
+ .Nm 3DES-CBC ,
+ and
+ .Nm NULL .
+@@ -340,6 +344,8 @@
+ .Em 128 ,
+ 192,
+ 256
++.It Nm Threefish-CBC , Nm Threefish-XTS
++.Em 512
+ .It Nm Blowfish-CBC
+ .Em 128
+ + n * 32, for n=[0..10]
