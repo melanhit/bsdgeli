@@ -1,0 +1,21 @@
+Index: secure/lib/libthreefish/Makefile
+===================================================================
+--- secure/lib/libthreefish/Makefile	(nonexistent)
++++ secure/lib/libthreefish/Makefile	(working copy)
+@@ -0,0 +1,16 @@
++PACKAGE=    threefish
++LIB=        threefish
++SHLIB_MAJOR=1
++
++THREEFISHDIR=${.CURDIR}/../../../crypto/threefish
++
++.PATH:  ${THREEFISHDIR}
++
++SRCS=   threefish_512.c
++INCS=   threefish.h
++
++PACKAGE=threefish
++
++CFLAGS+=-I${.CURDIR}
++
++.include <bsd.lib.mk>

@@ -1,0 +1,21 @@
+Index: sys/opencrypto/xform.c
+===================================================================
+--- sys/opencrypto/xform.c	(revision 313496)
++++ sys/opencrypto/xform.c	(working copy)
+@@ -64,6 +64,7 @@
+ #include <crypto/rijndael/rijndael.h>
+ #include <crypto/camellia/camellia.h>
+ #include <crypto/sha1.h>
++#include <crypto/threefish/threefish.h>
+ 
+ #include <opencrypto/cast.h>
+ #include <opencrypto/deflate.h>
+@@ -100,6 +101,8 @@
+ #include "xform_aes_icm.c"
+ #include "xform_aes_xts.c"
+ #include "xform_cml.c"
++#include "xform_threefish.c"
++#include "xform_threefish_xts.c"
+ 
+ /* Include the authentication and hashing algorithms */
+ #include "xform_gmac.c"

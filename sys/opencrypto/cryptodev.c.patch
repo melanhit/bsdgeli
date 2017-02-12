@@ -1,0 +1,17 @@
+Index: sys/opencrypto/cryptodev.c
+===================================================================
+--- sys/opencrypto/cryptodev.c	(revision 313496)
++++ sys/opencrypto/cryptodev.c	(working copy)
+@@ -440,6 +440,12 @@
+ 		case CRYPTO_AES_NIST_GCM_16:
+ 			txform = &enc_xform_aes_nist_gcm;
+  			break;
++		case CRYPTO_THREEFISH_CBC:
++			txform = &enc_xform_threefish;
++			break;
++		case CRYPTO_THREEFISH_XTS:
++			txform = &enc_xform_threefish_xts;
++			break;
+ 
+ 		default:
+ 			CRYPTDEB("invalid cipher");

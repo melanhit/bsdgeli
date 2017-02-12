@@ -1,0 +1,433 @@
+Index: crypto/threefish/threefish.h
+===================================================================
+--- crypto/threefish/threefish.h	(nonexistent)
++++ crypto/threefish/threefish.h	(working copy)
+@@ -0,0 +1,59 @@
++/*
++ *   Copyright (c) 2015-2016, Andrew Romanenko <melanhit@gmail.com>
++ *   All rights reserved.
++ *
++ *   Redistribution and use in source and binary forms, with or without
++ *   modification, are permitted provided that the following conditions are met:
++ *
++ *   1. Redistributions of source code must retain the above copyright notice, this
++ *      list of conditions and the following disclaimer.
++ *   2. Redistributions in binary form must reproduce the above copyright notice,
++ *      this list of conditions and the following disclaimer in the documentation
++ *      and/or other materials provided with the distribution.
++ *   3. Neither the name of the project nor the names of its contributors
++ *      may be used to endorse or promote products derived from this software
++ *      without specific prior written permission.
++ *
++ *   THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
++ *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ *   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
++ *   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ *   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ *   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef THREEFISH_H
++#define THREEFISH_H
++
++#define THREEFISH_512_BLKLEN   	64
++#define THREEFISH_512_KEYMIN   	64
++#define THREEFISH_512_KEYMAX   	64
++#define THREEFISH_512_KEYSTEP  	64
++
++#define THREEFISH_512_WORDS	8
++
++typedef struct {
++    uint64_t S[THREEFISH_512_WORDS * 19];
++    uint64_t k[THREEFISH_512_WORDS + 1];
++} threefish_512_ctx;
++
++typedef struct threefish_512_cbc_s {
++    threefish_512_ctx p;
++    uint8_t iv [THREEFISH_512_BLKLEN];
++    uint8_t buf[THREEFISH_512_BLKLEN];
++} threefish_512_cbc_ctx;
++
++void threefish_512_setkey (threefish_512_ctx *, const uint8_t *, size_t);
++void threefish_512_encrypt(threefish_512_ctx *, const uint8_t *, uint8_t *);
++void threefish_512_decrypt(threefish_512_ctx *, const uint8_t *, uint8_t *);
++
++void threefish_512_setkey_cbc (threefish_512_cbc_ctx *, const uint8_t *, size_t);
++void threefish_512_setiv_cbc  (threefish_512_cbc_ctx *, const uint8_t *, size_t);
++void threefish_512_encrypt_cbc(threefish_512_cbc_ctx *, const uint8_t *, size_t, uint8_t *);
++void threefish_512_decrypt_cbc(threefish_512_cbc_ctx *, const uint8_t *, size_t, uint8_t *);
++
++#endif  /* THREEFISH_H */
+Index: crypto/threefish/threefish_512.c
+===================================================================
+--- crypto/threefish/threefish_512.c	(nonexistent)
++++ crypto/threefish/threefish_512.c	(working copy)
+@@ -0,0 +1,188 @@
++/*
++ *   Copyright (c) 2015-2016, Andrew Romanenko <melanhit@gmail.com>
++ *   All rights reserved.
++ *
++ *   Redistribution and use in source and binary forms, with or without
++ *   modification, are permitted provided that the following conditions are met:
++ *
++ *   1. Redistributions of source code must retain the above copyright notice, this
++ *      list of conditions and the following disclaimer.
++ *   2. Redistributions in binary form must reproduce the above copyright notice,
++ *      this list of conditions and the following disclaimer in the documentation
++ *      and/or other materials provided with the distribution.
++ *   3. Neither the name of the project nor the names of its contributors
++ *      may be used to endorse or promote products derived from this software
++ *      without specific prior written permission.
++ *
++ *   THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
++ *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ *   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
++ *   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ *   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ *   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#include <stdlib.h>
++#include <stdint.h>
++#include <string.h>
++
++#include "threefish.h"
++#include "threefish_bits.h"
++#include "threefish_mix.h"
++
++#define WORDS	THREEFISH_512_WORDS
++#define ROUNDS	(72 / 8)
++#define SKEYS	((ROUNDS * 2) + 1)
++
++#define CONST_240   UINT64_C(0x1bd11bdaa9fc1a22)
++
++void threefish_512_setkey(threefish_512_ctx *ctx,
++                          const uint8_t *key,
++                          size_t __attribute__((unused)) len)
++{
++    uint64_t *k, *S;
++    size_t i, j;
++
++    k = ctx->k;
++
++    for(i = 0; i < WORDS; i++, key += 8)
++        k[i] = PACK64BE(key);
++
++    k[WORDS] = CONST_240;
++
++    for(i = 0; i < WORDS; i++)
++         k[WORDS] ^= k[i];
++
++    for(i = 0, S = ctx->S; i < SKEYS; i++, S += WORDS) {
++        for(j = 0; j < WORDS; j++)
++            S[j] = k[(i+j)%(WORDS+1)];
++
++        S[WORDS-1] += i;
++    }
++}
++
++void threefish_512_encrypt(threefish_512_ctx *ctx,
++                           const uint8_t *in_blk,
++                           uint8_t *out_blk)
++{
++    uint64_t s[WORDS], *S;
++    int i, j;
++
++    for(i = 0; i < WORDS; i++, in_blk += 8)
++        s[i] = PACK64BE(in_blk);
++
++    for(i = 0, S = ctx->S; i < ROUNDS; i++, S += WORDS) {
++        for(j = 0; j < WORDS; j++)
++            s[j] += S[j];
++
++        threefish_512_emix1(s, 46, 36, 19, 37);
++        threefish_512_emix2(s, 33, 27, 14, 42);
++        threefish_512_emix3(s, 17, 49, 36, 39);
++        threefish_512_emix4(s, 44,  9, 54, 56);
++
++        for(j = 0, S += WORDS; j < WORDS; j++)
++            s[j] += S[j];
++
++        threefish_512_emix1(s, 39, 30, 34, 24);
++        threefish_512_emix2(s, 13, 50, 10, 17);
++        threefish_512_emix3(s, 25, 29, 39, 43);
++        threefish_512_emix4(s,  8, 35, 56, 22);
++    }
++
++    for(i = 0; i < WORDS; i++, out_blk += 8)
++        UNPACK64BE(out_blk, s[i] + S[i]);
++}
++
++void threefish_512_decrypt(threefish_512_ctx *ctx,
++                           const uint8_t *in_blk,
++                           uint8_t *out_blk)
++{
++    uint64_t s[WORDS], *S;
++    int i, j;
++
++    for(i = 0; i < WORDS; i++, in_blk += 8)
++        s[i] = PACK64BE(in_blk);
++
++    S = ctx->S + (WORDS * (SKEYS - 1));
++    for(i = 0; i < WORDS; i++)
++        s[i] -= S[i];
++
++    for(i = ROUNDS; i > 0; i--) {
++        threefish_512_dmix1(s, 22, 56, 35,  8);
++        threefish_512_dmix2(s, 43, 39, 29, 25);
++        threefish_512_dmix3(s, 17, 10, 50, 13);
++        threefish_512_dmix4(s, 24, 34, 30, 39);
++
++        for(j = 0, S -= WORDS; j < WORDS; j++)
++            s[j] -= S[j];
++
++        threefish_512_dmix1(s, 56, 54,  9, 44);
++        threefish_512_dmix2(s, 39, 36, 49, 17);
++        threefish_512_dmix3(s, 42, 14, 27, 33);
++        threefish_512_dmix4(s, 37, 19, 36, 46);
++
++        for(j = 0, S -= WORDS; j < WORDS; j++)
++            s[j] -= S[j];
++    }
++
++    for(i = 0; i < WORDS; i++, out_blk += 8)
++        UNPACK64BE(out_blk, s[i]);
++}
++
++void threefish_512_setkey_cbc(threefish_512_cbc_ctx *ctx,
++				const uint8_t *key,
++				size_t __attribute__((unused)) len)
++{
++	threefish_512_setkey(&ctx->p, key, len);
++}
++
++void threefish_512_setiv_cbc(threefish_512_cbc_ctx *ctx,
++				const uint8_t *iv,
++				size_t __attribute__((unused)) len)
++{
++	if(!iv)
++        memset(ctx->iv, 0, THREEFISH_512_BLKLEN);
++	else
++        memcpy(ctx->iv, iv, THREEFISH_512_BLKLEN);
++}
++
++void threefish_512_encrypt_cbc(threefish_512_cbc_ctx *ctx,
++                               const uint8_t *in_blk,
++                               size_t len,
++                               uint8_t *out_blk)
++{
++    size_t i, j, nb;
++
++    nb = len / THREEFISH_512_BLKLEN;
++    for(i = 0; i < nb; i++, in_blk += THREEFISH_512_BLKLEN, out_blk += THREEFISH_512_BLKLEN) {
++	    for(j = 0; j < THREEFISH_512_BLKLEN; j++)
++		    ctx->iv[j] ^= in_blk[j];
++		
++        threefish_512_encrypt(&ctx->p, ctx->iv, out_blk);
++
++        memcpy(ctx->iv, out_blk, THREEFISH_512_BLKLEN);
++    }
++}
++
++void threefish_512_decrypt_cbc(threefish_512_cbc_ctx *ctx,
++                               const uint8_t *in_blk,
++                               size_t len,
++                               uint8_t *out_blk)
++{
++    size_t i, j, nb;
++
++    nb = len / THREEFISH_512_BLKLEN;
++	for(i = 0; i < nb; i++, in_blk += THREEFISH_512_BLKLEN, out_blk += THREEFISH_512_BLKLEN) {
++        threefish_512_decrypt(&ctx->p, in_blk, ctx->buf);
++
++        for(j = 0; j < THREEFISH_512_BLKLEN; j++)
++            ctx->buf[j] = ctx->iv[j] ^ ctx->buf[j];
++
++        memcpy(ctx->iv, in_blk, THREEFISH_512_BLKLEN);
++        memcpy(out_blk, ctx->buf, THREEFISH_512_BLKLEN);
++    }
++}
+Index: crypto/threefish/threefish_bits.h
+===================================================================
+--- crypto/threefish/threefish_bits.h	(nonexistent)
++++ crypto/threefish/threefish_bits.h	(working copy)
+@@ -0,0 +1,70 @@
++/*
++ *   Copyright (c) 2014-2016, Andrew Romanenko <melanhit@gmail.com>
++ *   All rights reserved.
++ *
++ *   Redistribution and use in source and binary forms, with or without
++ *   modification, are permitted provided that the following conditions are met:
++ *
++ *   1. Redistributions of source code must retain the above copyright notice, this
++ *      list of conditions and the following disclaimer.
++ *   2. Redistributions in binary form must reproduce the above copyright notice,
++ *      this list of conditions and the following disclaimer in the documentation
++ *      and/or other materials provided with the distribution.
++ *   3. Neither the name of the project nor the names of its contributors
++ *      may be used to endorse or promote products derived from this software
++ *      without specific prior written permission.
++ *
++ *   THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
++ *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ *   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
++ *   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ *   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ *   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef THREEFISH_BITS_H
++#define THREEFISH_BITS_H
++
++#ifndef ROTL64
++#define ROTL64(x, n)  (((x) << (n)) | ((x) >> (64 - (n))))
++#endif  /* ROTL64 */
++
++#ifndef ROTR64
++#define ROTR64(x, n)  (((x) >> (n)) | ((x) << (64 - (n))))
++#endif  /* ROTR64 */
++
++/* unpack uint64_t into 8 uint8_t (big-endian) */
++#ifndef UNPACK64BE
++#define UNPACK64BE(ct, st)                          \
++{                                                   \
++    (ct)[0] = (uint8_t)(st);                        \
++    (ct)[1] = (uint8_t)((st) >> 8);                 \
++    (ct)[2] = (uint8_t)((st) >> 16);                \
++    (ct)[3] = (uint8_t)((st) >> 24);                \
++    (ct)[4] = (uint8_t)((st) >> 32);                \
++    (ct)[5] = (uint8_t)((st) >> 40);                \
++    (ct)[6] = (uint8_t)((st) >> 48);                \
++    (ct)[7] = (uint8_t)((st) >> 56);                \
++}
++#endif  /* UNPACK64BE */
++
++/* pack 8 uint8_t into uint64_t (big-endian) */
++#ifndef PACK64BE
++#define PACK64BE(pt)                                \
++(                                                   \
++      ((uint64_t)(pt)[0]      )                     \
++    ^ ((uint64_t)(pt)[1] <<  8)                     \
++    ^ ((uint64_t)(pt)[2] << 16)                     \
++    ^ ((uint64_t)(pt)[3] << 24)                     \
++    ^ ((uint64_t)(pt)[4] << 32)                     \
++    ^ ((uint64_t)(pt)[5] << 40)                     \
++    ^ ((uint64_t)(pt)[6] << 48)                     \
++    ^ ((uint64_t)(pt)[7] << 56)                     \
++)
++#endif  /* PACK64BE */
++
++#endif  /* THREEFISH_BITS_H */
+Index: crypto/threefish/threefish_mix.h
+===================================================================
+--- crypto/threefish/threefish_mix.h	(nonexistent)
++++ crypto/threefish/threefish_mix.h	(working copy)
+@@ -0,0 +1,96 @@
++/*
++ *   Copyright (c) 2015, Andrew Romanenko <melanhit@gmail.com>
++ *   All rights reserved.
++ *
++ *   Redistribution and use in source and binary forms, with or without
++ *   modification, are permitted provided that the following conditions are met:
++ *
++ *   1. Redistributions of source code must retain the above copyright notice, this
++ *      list of conditions and the following disclaimer.
++ *   2. Redistributions in binary form must reproduce the above copyright notice,
++ *      this list of conditions and the following disclaimer in the documentation
++ *      and/or other materials provided with the distribution.
++ *   3. Neither the name of the project nor the names of its contributors
++ *      may be used to endorse or promote products derived from this software
++ *      without specific prior written permission.
++ *
++ *   THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS "AS IS" AND
++ *   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
++ *   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
++ *   DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
++ *   ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
++ *   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
++ *   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
++ *   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
++ *   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
++ *   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
++ */
++
++#ifndef THREEFISH_MIX_H
++#define THREEFISH_MIX_H
++
++#define threefish_512_emix1(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[0] += x[1]; x[1] = ROTL64(x[1], d1) ^ x[0];               \
++    x[2] += x[3]; x[3] = ROTL64(x[3], d2) ^ x[2];               \
++    x[4] += x[5]; x[5] = ROTL64(x[5], d3) ^ x[4];               \
++    x[6] += x[7]; x[7] = ROTL64(x[7], d4) ^ x[6];               \
++}
++
++#define threefish_512_emix2(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[2] += x[1]; x[1] = ROTL64(x[1], d1) ^ x[2];               \
++    x[4] += x[7]; x[7] = ROTL64(x[7], d2) ^ x[4];               \
++    x[6] += x[5]; x[5] = ROTL64(x[5], d3) ^ x[6];               \
++    x[0] += x[3]; x[3] = ROTL64(x[3], d4) ^ x[0];               \
++}
++
++#define threefish_512_emix3(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[4] += x[1]; x[1] = ROTL64(x[1], d1) ^ x[4];               \
++    x[6] += x[3]; x[3] = ROTL64(x[3], d2) ^ x[6];               \
++    x[0] += x[5]; x[5] = ROTL64(x[5], d3) ^ x[0];               \
++    x[2] += x[7]; x[7] = ROTL64(x[7], d4) ^ x[2];               \
++}
++
++#define threefish_512_emix4(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[6] += x[1]; x[1] = ROTL64(x[1], d1) ^ x[6];               \
++    x[0] += x[7]; x[7] = ROTL64(x[7], d2) ^ x[0];               \
++    x[2] += x[5]; x[5] = ROTL64(x[5], d3) ^ x[2];               \
++    x[4] += x[3]; x[3] = ROTL64(x[3], d4) ^ x[4];               \
++}
++
++#define threefish_512_dmix1(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[3] ^= x[4]; x[3] = ROTR64(x[3], d1); x[4] -= x[3];        \
++    x[5] ^= x[2]; x[5] = ROTR64(x[5], d2); x[2] -= x[5];        \
++    x[7] ^= x[0]; x[7] = ROTR64(x[7], d3); x[0] -= x[7];        \
++    x[1] ^= x[6]; x[1] = ROTR64(x[1], d4); x[6] -= x[1];        \
++}
++
++#define threefish_512_dmix2(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[7] ^= x[2]; x[7] = ROTR64(x[7], d1); x[2] -= x[7];        \
++    x[5] ^= x[0]; x[5] = ROTR64(x[5], d2); x[0] -= x[5];        \
++    x[3] ^= x[6]; x[3] = ROTR64(x[3], d3); x[6] -= x[3];        \
++    x[1] ^= x[4]; x[1] = ROTR64(x[1], d4); x[4] -= x[1];        \
++}
++
++#define threefish_512_dmix3(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[3] ^= x[0]; x[3] = ROTR64(x[3], d1); x[0] -= x[3];        \
++    x[5] ^= x[6]; x[5] = ROTR64(x[5], d2); x[6] -= x[5];        \
++    x[7] ^= x[4]; x[7] = ROTR64(x[7], d3); x[4] -= x[7];        \
++    x[1] ^= x[2]; x[1] = ROTR64(x[1], d4); x[2] -= x[1];        \
++}
++
++#define threefish_512_dmix4(x, d1, d2, d3, d4)                  \
++{                                                               \
++    x[7] ^= x[6]; x[7] = ROTR64(x[7], d1); x[6] -= x[7];        \
++    x[5] ^= x[4]; x[5] = ROTR64(x[5], d2); x[4] -= x[5];        \
++    x[3] ^= x[2]; x[3] = ROTR64(x[3], d3); x[2] -= x[3];        \
++    x[1] ^= x[0]; x[1] = ROTR64(x[1], d4); x[0] -= x[1];        \
++}
++
++#endif  /* THREEFISH_MIX_H */

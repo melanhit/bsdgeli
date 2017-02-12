@@ -1,0 +1,20 @@
+Index: share/mk/src.libnames.mk
+===================================================================
+--- share/mk/src.libnames.mk	(revision 313496)
++++ share/mk/src.libnames.mk	(working copy)
+@@ -159,6 +159,7 @@
+ 		tacplus \
+ 		termcap \
+ 		termcapw \
++		threefish \
+ 		ufs \
+ 		ugidfw \
+ 		ulog \
+@@ -533,6 +534,7 @@
+ LIBPANELDIR=	${OBJTOP}/lib/ncurses/panel
+ LIBPANELWDIR=	${OBJTOP}/lib/ncurses/panelw
+ LIBCRYPTODIR=	${OBJTOP}/secure/lib/libcrypto
++LIBTHREEFISHDIR=${OBJTOP}/secure/lib/libthreefish
+ LIBSSHDIR=	${OBJTOP}/secure/lib/libssh
+ LIBSSLDIR=	${OBJTOP}/secure/lib/libssl
+ LIBTEKENDIR=	${OBJTOP}/sys/teken/libteken

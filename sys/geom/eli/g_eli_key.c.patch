@@ -1,0 +1,12 @@
+Index: sys/geom/eli/g_eli_key.c
+===================================================================
+--- sys/geom/eli/g_eli_key.c	(revision 313496)
++++ sys/geom/eli/g_eli_key.c	(working copy)
+@@ -226,6 +226,7 @@
+ 	 */
+ 	switch (sc->sc_ealgo) {
+ 	case CRYPTO_AES_XTS:
++	case CRYPTO_THREEFISH_XTS:
+ 		break;
+ 	default:
+ 		SHA256_Init(&sc->sc_ivctx);

@@ -1,0 +1,40 @@
+Index: sys/geom/eli/g_eli.h
+===================================================================
+--- sys/geom/eli/g_eli.h	(revision 313496)
++++ sys/geom/eli/g_eli.h	(working copy)
+@@ -427,6 +427,12 @@
+ 		return (CRYPTO_3DES_CBC);
+ 	else if (strcasecmp("3des-cbc", name) == 0)
+ 		return (CRYPTO_3DES_CBC);
++	else if (strcasecmp("threefish", name) == 0)
++		return (CRYPTO_THREEFISH_XTS);
++	else if (strcasecmp("threefish-cbc", name) == 0)
++		return (CRYPTO_THREEFISH_CBC);
++	else if (strcasecmp("threefish-xts", name) == 0)
++		return (CRYPTO_THREEFISH_XTS);
+ 	return (CRYPTO_ALGORITHM_MIN - 1);
+ }
+ 
+@@ -466,6 +472,10 @@
+ 		return ("CAMELLIA-CBC");
+ 	case CRYPTO_3DES_CBC:
+ 		return ("3DES-CBC");
++	case CRYPTO_THREEFISH_CBC:
++		return ("Threefish-CBC");
++	case CRYPTO_THREEFISH_XTS:
++		return ("Threefish-XTS");
+ 	case CRYPTO_MD5_HMAC:
+ 		return ("HMAC/MD5");
+ 	case CRYPTO_SHA1_HMAC:
+@@ -567,6 +577,11 @@
+ 		if (keylen == 0 || keylen == 192)
+ 			return (192);
+ 		return (0);
++	case CRYPTO_THREEFISH_CBC:
++	case CRYPTO_THREEFISH_XTS:
++		if (keylen == 0 || keylen == 512)
++			return (512);
++		return (0);
+ 	default:
+ 		return (0);
+ 	}
