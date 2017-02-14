@@ -2,7 +2,23 @@ Index: sbin/geom/class/eli/geli.8
 ===================================================================
 --- sbin/geom/class/eli/geli.8	(revision 313496)
 +++ sbin/geom/class/eli/geli.8	(working copy)
-@@ -172,7 +172,9 @@
+@@ -61,6 +61,7 @@
+ .Op Fl l Ar keylen
+ .Op Fl s Ar sectorsize
+ .Op Fl V Ar version
++.Op Fl H Ar header
+ .Ar prov
+ .Nm
+ .Cm label - an alias for
+@@ -70,6 +71,7 @@
+ .Op Fl dprv
+ .Op Fl j Ar passfile
+ .Op Fl k Ar keyfile
++.Op Fl H Ar header
+ .Ar prov
+ .Nm
+ .Cm detach
+@@ -172,7 +174,9 @@
  .Nm AES-XTS ,
  .Nm AES-CBC ,
  .Nm Blowfish-CBC ,
@@ -13,7 +29,16 @@ Index: sbin/geom/class/eli/geli.8
  and
  .Nm 3DES-CBC ) .
  .It
-@@ -286,6 +288,8 @@
+@@ -216,6 +220,8 @@
+ it is possible to get the data back by restoring keys from
+ backup.
+ .It
++Allows storing metadata into a separate file
++.It
+ Providers can be configured to automatically detach on last close
+ (so users do not have to remember to detach providers after unmounting
+ the file systems).
+@@ -286,6 +292,8 @@
  .Nm AES-CBC ,
  .Nm Blowfish-CBC ,
  .Nm Camellia-CBC ,
@@ -22,7 +47,7 @@ Index: sbin/geom/class/eli/geli.8
  .Nm 3DES-CBC ,
  and
  .Nm NULL .
-@@ -340,6 +344,8 @@
+@@ -340,6 +348,8 @@
  .Em 128 ,
  192,
  256
@@ -31,3 +56,42 @@ Index: sbin/geom/class/eli/geli.8
  .It Nm Blowfish-CBC
  .Em 128
  + n * 32, for n=[0..10]
+@@ -377,6 +387,8 @@
+ section to find which metadata version is supported by which FreeBSD version.
+ Note that using an older version of metadata may limit the number of
+ features available.
++.It Fl H Ar header
++Store metadata (header) into a separate file instead of the provider
+ .El
+ .It Cm attach
+ Attach the given provider.
+@@ -423,6 +435,8 @@
+ .It Fl r
+ Attach read-only provider.
+ It will not be opened for writing.
++.It Fl H Ar header
++Load metadata from a file instead of the provider
+ .El
+ .It Cm detach
+ Detach the given providers, which means remove the devfs entry
+@@ -935,6 +949,20 @@
+ geli_da1s3a_keyfile_name="/boot/keys/da1s3a.key"
+ .Ed
+ .Pp
++Configure provider which will be attached on boot, use detachable header
++.Bd -literal -offset indent
++# dd if=/dev/random of=/boot/geli/ada1.key bs=1k count=1
++# geli init -b -P -K /boot/geli/ada1.key -H /boot/geli/ada1.hd ada1
++
++geli_ada1_keyfile_load="YES"
++geli_ada1_keyfile_type="ada1:geli_keyfile"
++geli_ada1_keyfile_name="/boot/geli/ada1.key"
++
++geli_ada1_header_load="YES"
++geli_ada1_header_type="ada1:geli_keyfile"
++geli_ada1_header_name="/boot/geli/ada1.hd"
++.Ed
++.Pp
+ Not only configure encryption, but also data integrity verification using
+ .Nm HMAC/SHA256 .
+ .Bd -literal -offset indent

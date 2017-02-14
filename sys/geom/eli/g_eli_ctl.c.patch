@@ -1,0 +1,45 @@
+Index: sys/geom/eli/g_eli_ctl.c
+===================================================================
+--- sys/geom/eli/g_eli_ctl.c	(revision 313496)
++++ sys/geom/eli/g_eli_ctl.c	(working copy)
+@@ -53,12 +53,12 @@
+ static void
+ g_eli_ctl_attach(struct gctl_req *req, struct g_class *mp)
+ {
+-	struct g_eli_metadata md;
++	struct g_eli_metadata md, *hd;
+ 	struct g_provider *pp;
+ 	const char *name;
+ 	u_char *key, mkey[G_ELI_DATAIVKEYLEN];
+ 	int *nargs, *detach, *readonly;
+-	int keysize, error;
++	int keysize, hdsize, error;
+ 	u_int nkey;
+ 
+ 	g_topology_assert();
+@@ -97,11 +97,20 @@
+ 		gctl_error(req, "Provider %s is invalid.", name);
+ 		return;
+ 	}
+-	error = g_eli_read_metadata(mp, pp, &md);
+-	if (error != 0) {
+-		gctl_error(req, "Cannot read metadata from %s (error=%d).",
+-		    name, error);
+-		return;
++	hd = gctl_get_param(req, "hd", &hdsize);
++	if(hd == NULL) {
++		error = g_eli_read_metadata(mp, pp, &md);
++			if (error != 0) {
++				gctl_error(req, "Cannot read metadata from %s (error=%d).",
++		    		name, error);
++				return;
++			}
++	} else {
++		if(hdsize > sizeof(md)) {
++			gctl_error(req, "Metadata is invalid.");
++			return;
++		}
++		memcpy(&md, hd, hdsize);
+ 	}
+ 	if (md.md_keys == 0x00) {
+ 		bzero(&md, sizeof(md));

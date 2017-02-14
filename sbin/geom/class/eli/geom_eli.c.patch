@@ -1,0 +1,133 @@
+Index: sbin/geom/class/eli/geom_eli.c
+===================================================================
+--- sbin/geom/class/eli/geom_eli.c	(revision 313496)
++++ sbin/geom/class/eli/geom_eli.c	(working copy)
+@@ -82,7 +82,7 @@
+ /*
+  * Available commands:
+  *
+- * init [-bgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] prov
++ * init [-bgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] [-H header] prov
+  * label - alias for 'init'
+  * attach [-dprv] [-j passfile] [-k keyfile] prov
+  * detach [-fl] prov ...
+@@ -117,9 +117,10 @@
+ 		{ 's', "sectorsize", "0", G_TYPE_NUMBER },
+ 		{ 'T', "notrim", NULL, G_TYPE_BOOL },
+ 		{ 'V', "mdversion", "-1", G_TYPE_NUMBER },
++		{ 'H', "header", "", G_TYPE_STRING },
+ 		G_OPT_SENTINEL
+ 	    },
+-	    "[-bgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] prov"
++	    "[-bgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] [-H header] prov"
+ 	},
+ 	{ "label", G_FLAG_VERBOSE, eli_main,
+ 	    {
+@@ -135,6 +136,7 @@
+ 		{ 'P', "nonewpassphrase", NULL, G_TYPE_BOOL },
+ 		{ 's', "sectorsize", "0", G_TYPE_NUMBER },
+ 		{ 'V', "mdversion", "-1", G_TYPE_NUMBER },
++		{ 'H', "header", "", G_TYPE_STRING },
+ 		G_OPT_SENTINEL
+ 	    },
+ 	    "- an alias for 'init'"
+@@ -146,9 +148,10 @@
+ 		{ 'k', "keyfile", G_VAL_OPTIONAL, G_TYPE_STRING | G_TYPE_MULTI },
+ 		{ 'p', "nopassphrase", NULL, G_TYPE_BOOL },
+ 		{ 'r', "readonly", NULL, G_TYPE_BOOL },
++		{ 'H', "header", "", G_TYPE_STRING },
+ 		G_OPT_SENTINEL
+ 	    },
+-	    "[-dprv] [-j passfile] [-k keyfile] prov"
++	    "[-dprv] [-j passfile] [-k keyfile] [-H header] prov"
+ 	},
+ 	{ "detach", 0, NULL,
+ 	    {
+@@ -633,7 +636,7 @@
+ 		int fd;
+ 
+ 		/* This is a file probably. */
+-		fd = open(prov, O_WRONLY | O_TRUNC);
++		fd = open(prov, O_WRONLY | O_TRUNC | O_CREAT, 0600);
+ 		if (fd == -1) {
+ 			gctl_error(req, "Cannot open %s: %s.", prov,
+ 			    strerror(errno));
+@@ -666,10 +669,9 @@
+ eli_init(struct gctl_req *req)
+ {
+ 	struct g_eli_metadata md;
+-	unsigned char sector[sizeof(struct g_eli_metadata)];
+ 	unsigned char key[G_ELI_USERKEYLEN];
+ 	char backfile[MAXPATHLEN];
+-	const char *str, *prov;
++	const char *str, *prov, *hdname;
+ 	unsigned int secsize, version;
+ 	off_t mediasize;
+ 	intmax_t val;
+@@ -833,17 +835,26 @@
+ 		return;
+ 	}
+ 
+-	eli_metadata_encode(&md, sector);
++	hdname = gctl_get_ascii(req, "header");
++	if(*hdname == '\0')
++		str = prov;
++	else
++		str = hdname;
++
++	error = eli_metadata_store(req, str, &md);
+ 	bzero(&md, sizeof(md));
+-	error = g_metadata_store(prov, sector, sizeof(sector));
+-	bzero(sector, sizeof(sector));
+ 	if (error != 0) {
+-		gctl_error(req, "Cannot store metadata on %s: %s.", prov,
++		gctl_error(req, "Cannot store metadata on %s: %s.", str,
+ 		    strerror(error));
+ 		return;
+ 	}
+ 	if (verbose)
+-		printf("Metadata value stored on %s.\n", prov);
++		printf("Metadata value stored on %s.\n", str);
++
++	/* Don't backup metadata if use detached header */
++	if(*hdname != '\0' && strcmp(backfile, "none") != 0)
++		return;
++
+ 	/* Backup metadata to a file. */
+ 	str = gctl_get_ascii(req, "backupfile");
+ 	if (str[0] != '\0') {
+@@ -877,7 +888,7 @@
+ {
+ 	struct g_eli_metadata md;
+ 	unsigned char key[G_ELI_USERKEYLEN];
+-	const char *prov;
++	const char *str, *prov, *hdname;
+ 	off_t mediasize;
+ 	int nargs;
+ 
+@@ -887,8 +898,14 @@
+ 		return;
+ 	}
+ 	prov = gctl_get_ascii(req, "arg0");
++	hdname = gctl_get_ascii(req, "header");
+ 
+-	if (eli_metadata_read(req, prov, &md) == -1)
++	if(*hdname == '\0')
++		str = prov;
++	else
++		str = hdname;
++
++	if (eli_metadata_read(req, str, &md) == -1)
+ 		return;
+ 
+ 	mediasize = g_get_mediasize(prov);
+@@ -902,6 +919,9 @@
+ 		return;
+ 	}
+ 
++	if(*hdname != '\0')
++		gctl_ro_param(req, "hd", sizeof(md), &md);
++
+ 	gctl_ro_param(req, "key", sizeof(key), key);
+ 	if (gctl_issue(req) == NULL) {
+ 		if (verbose)
