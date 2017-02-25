@@ -88,7 +88,7 @@ Index: sbin/geom/class/eli/geli.8
 +geli_ada1_keyfile_name="/boot/geli/ada1.key"
 +
 +geli_ada1_header_load="YES"
-+geli_ada1_header_type="ada1:geli_keyfile"
++geli_ada1_header_type="ada1:geli_header"
 +geli_ada1_header_name="/boot/geli/ada1.hd"
 +.Ed
 +.Pp
