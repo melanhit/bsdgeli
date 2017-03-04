@@ -1,0 +1,12 @@
+Index: sys/conf/files.powerpc
+===================================================================
+--- sys/conf/files.powerpc	(revision 314509)
++++ sys/conf/files.powerpc	(working copy)
+@@ -22,6 +22,7 @@
+ cddl/dev/fbt/powerpc/fbt_isa.c			optional dtrace_fbt | dtraceall compile-with "${FBT_C}"
+ crypto/blowfish/bf_enc.c	optional	crypto | ipsec
+ crypto/des/des_enc.c		optional	crypto | ipsec | netsmb
++crypto/threefish/threefish.c	optional	crypto | ipsec
+ dev/bm/if_bm.c			optional	bm powermac
+ dev/adb/adb_bus.c		optional	adb
+ dev/adb/adb_kbd.c		optional	adb
