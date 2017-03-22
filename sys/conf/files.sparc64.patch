@@ -1,12 +1,12 @@
 Index: sys/conf/files.sparc64
 ===================================================================
---- sys/conf/files.sparc64	(revision 314509)
+--- sys/conf/files.sparc64	(revision 315705)
 +++ sys/conf/files.sparc64	(working copy)
 @@ -25,6 +25,7 @@
  cddl/contrib/opensolaris/common/atomic/sparc64/opensolaris_atomic.S	optional zfs compile-with "${ZFS_S}"
- crypto/blowfish/bf_enc.c	optional	crypto | ipsec
- crypto/des/des_enc.c		optional	crypto | ipsec | netsmb
-+crypto/threefish/threefish.c	optional	crypto | ipsec
+ crypto/blowfish/bf_enc.c	optional	crypto | ipsec | ipsec_support
+ crypto/des/des_enc.c		optional	crypto | ipsec | ipsec_support | netsmb
++crypto/threefish/threefish.c	optional	crypto | ipsec | ipsec_support
  dev/atkbdc/atkbd.c		optional	atkbd atkbdc
  dev/atkbdc/atkbd_atkbdc.c	optional	atkbd atkbdc
  dev/atkbdc/atkbdc.c		optional	atkbdc

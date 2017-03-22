@@ -1,12 +1,12 @@
 Index: sys/conf/files.pc98
 ===================================================================
---- sys/conf/files.pc98	(revision 314509)
+--- sys/conf/files.pc98	(revision 315705)
 +++ sys/conf/files.pc98	(working copy)
 @@ -95,6 +95,7 @@
  	compile-with	"${CC} -c -I$S/crypto/blowfish/arch/i386 ${ASM_CFLAGS} ${WERROR} ${.IMPSRC}" \
  	no-implicit-rule
- crypto/des/arch/i386/des_enc.S	optional crypto | ipsec | netsmb
-+crypto/threefish/threefish.c	optional crypto | ipsec
+ crypto/des/arch/i386/des_enc.S	optional crypto | ipsec | ipsec_support | netsmb
++crypto/threefish/threefish.c	optional crypto | ipsec | ipsec_support
  dev/agp/agp_ali.c		optional agp
  dev/agp/agp_amd.c		optional agp
  dev/agp/agp_i810.c		optional agp

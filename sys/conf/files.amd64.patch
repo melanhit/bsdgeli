@@ -1,12 +1,12 @@
-Index: /usr/src/sys/conf/files.amd64
+Index: sys/conf/files.amd64
 ===================================================================
---- /usr/src/sys/conf/files.amd64	(revision 315075)
-+++ /usr/src/sys/conf/files.amd64	(working copy)
-@@ -180,6 +180,7 @@
- 	no-implicit-rule						\
- 	clean		"aesni_wrap.o"
- crypto/blowfish/bf_enc.c	optional	crypto | ipsec
-+crypto/threefish/amd64/threefish_512.S	optional	crypto | ipsec
- crypto/des/des_enc.c		optional	crypto | ipsec | netsmb
+--- sys/conf/files.amd64	(revision 315705)
++++ sys/conf/files.amd64	(working copy)
+@@ -182,6 +182,7 @@
+ crypto/blowfish/bf_enc.c	optional	crypto | ipsec | ipsec_support
+ crypto/des/des_enc.c		optional	crypto | ipsec | \
+ 	ipsec_support | netsmb
++crypto/threefish/amd64/threefish_512.S	optional	crypto | ipsec | ipsec_support
  crypto/via/padlock.c		optional	padlock
  crypto/via/padlock_cipher.c	optional	padlock
+ crypto/via/padlock_hash.c	optional	padlock
