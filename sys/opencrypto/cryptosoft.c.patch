@@ -1,6 +1,6 @@
 Index: sys/opencrypto/cryptosoft.c
 ===================================================================
---- sys/opencrypto/cryptosoft.c	(revision 313496)
+--- sys/opencrypto/cryptosoft.c	(revision 320320)
 +++ sys/opencrypto/cryptosoft.c	(working copy)
 @@ -802,6 +802,12 @@
  		case CRYPTO_CAMELLIA_CBC:
@@ -15,7 +15,7 @@ Index: sys/opencrypto/cryptosoft.c
  		case CRYPTO_NULL_CBC:
  			txf = &enc_xform_null;
  			goto enccommon;
-@@ -1009,6 +1015,8 @@
+@@ -1012,6 +1018,8 @@
  		case CRYPTO_AES_NIST_GCM_16:
  		case CRYPTO_AES_NIST_GMAC:
  		case CRYPTO_CAMELLIA_CBC:
@@ -24,7 +24,7 @@ Index: sys/opencrypto/cryptosoft.c
  		case CRYPTO_NULL_CBC:
  			txf = swd->sw_exf;
  
-@@ -1135,6 +1143,8 @@
+@@ -1138,6 +1146,8 @@
  		case CRYPTO_AES_XTS:
  		case CRYPTO_AES_ICM:
  		case CRYPTO_CAMELLIA_CBC:
@@ -33,7 +33,7 @@ Index: sys/opencrypto/cryptosoft.c
  			if ((crp->crp_etype = swcr_encdec(crd, sw,
  			    crp->crp_buf, crp->crp_flags)) != 0)
  				goto done;
-@@ -1243,6 +1253,8 @@
+@@ -1246,6 +1256,8 @@
  	REGISTER(CRYPTO_AES_192_NIST_GMAC);
  	REGISTER(CRYPTO_AES_256_NIST_GMAC);
   	REGISTER(CRYPTO_CAMELLIA_CBC);

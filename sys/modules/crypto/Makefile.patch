@@ -1,16 +1,8 @@
 Index: sys/modules/crypto/Makefile
 ===================================================================
---- sys/modules/crypto/Makefile	(revision 314509)
+--- sys/modules/crypto/Makefile	(revision 320320)
 +++ sys/modules/crypto/Makefile	(working copy)
-@@ -9,6 +9,7 @@
- .PATH:	${.CURDIR}/../../crypto/sha2
- .PATH:	${.CURDIR}/../../crypto/siphash
- .PATH:	${.CURDIR}/../../crypto/skein
-+.PATH:	${.CURDIR}/../../crypto/threefish
- 
- KMOD	= crypto
- SRCS	= crypto.c cryptodev_if.c
-@@ -19,6 +20,12 @@
+@@ -19,6 +19,12 @@
  SRCS	+= des_ecb.c des_enc.c des_setkey.c
  SRCS	+= sha1.c sha256c.c sha512c.c
  SRCS	+= skein.c skein_block.c
@@ -21,5 +13,5 @@ Index: sys/modules/crypto/Makefile
 +SRCS	+= threefish.c
 +.endif
  .if exists(${MACHINE_ARCH}/skein_block_asm.s)
- .PATH:	${.CURDIR}/../../crypto/skein/${MACHINE_ARCH}
+ .PATH:	${SRCTOP}/sys/crypto/skein/${MACHINE_ARCH}
  SRCS	+= skein_block_asm.s

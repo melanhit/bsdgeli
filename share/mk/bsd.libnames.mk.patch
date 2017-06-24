@@ -1,12 +1,12 @@
 Index: share/mk/bsd.libnames.mk
 ===================================================================
---- share/mk/bsd.libnames.mk	(revision 313496)
+--- share/mk/bsd.libnames.mk	(revision 320320)
 +++ share/mk/bsd.libnames.mk	(working copy)
-@@ -146,6 +146,7 @@
- LIBTERMCAPW?=	${DESTDIR}${LIBDIR}/libtermcapw.a
+@@ -147,6 +147,7 @@
+ LIBTERMCAPW?=	${DESTDIR}${LIBDIR_BASE}/libtermcapw.a
  LIBTERMLIB?=	"don't use LIBTERMLIB, use LIBTERMCAP"
  LIBTINFO?=	"don't use LIBTINFO, use LIBNCURSES"
-+LIBTHREEFISH?=	${DESTDIR}${LIBDIR}/libthreefish.a
- LIBUFS?=	${DESTDIR}${LIBDIR}/libufs.a
- LIBUGIDFW?=	${DESTDIR}${LIBDIR}/libugidfw.a
- LIBULOG?=	${DESTDIR}${LIBDIR}/libulog.a
++LIBTHREEFISH?=	${DESTDIR}${LIBDIR_BASE}/libthreefish.a
+ LIBUFS?=	${DESTDIR}${LIBDIR_BASE}/libufs.a
+ LIBUGIDFW?=	${DESTDIR}${LIBDIR_BASE}/libugidfw.a
+ LIBULOG?=	${DESTDIR}${LIBDIR_BASE}/libulog.a

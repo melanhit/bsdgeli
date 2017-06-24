@@ -1,6 +1,6 @@
 Index: sys/geom/eli/g_eli_hmac.c
 ===================================================================
---- sys/geom/eli/g_eli_hmac.c	(revision 313496)
+--- sys/geom/eli/g_eli_hmac.c	(revision 320320)
 +++ sys/geom/eli/g_eli_hmac.c	(working copy)
 @@ -131,6 +131,7 @@
  

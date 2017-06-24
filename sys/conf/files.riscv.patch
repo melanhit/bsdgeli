@@ -1,6 +1,6 @@
 Index: sys/conf/files.riscv
 ===================================================================
---- sys/conf/files.riscv	(revision 315705)
+--- sys/conf/files.riscv	(revision 320320)
 +++ sys/conf/files.riscv	(working copy)
 @@ -5,6 +5,7 @@
  cddl/dev/fbt/riscv/fbt_isa.c				optional dtrace_fbt | dtraceall compile-with "${FBT_C}"

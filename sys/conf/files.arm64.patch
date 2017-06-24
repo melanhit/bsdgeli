@@ -1,6 +1,6 @@
 Index: sys/conf/files.arm64
 ===================================================================
---- sys/conf/files.arm64	(revision 315705)
+--- sys/conf/files.arm64	(revision 320320)
 +++ sys/conf/files.arm64	(working copy)
 @@ -67,6 +67,7 @@
  arm64/cloudabi64/cloudabi64_sysvec.c	optional compat_cloudabi64

@@ -1,6 +1,6 @@
 Index: sbin/geom/class/eli/geli.8
 ===================================================================
---- sbin/geom/class/eli/geli.8	(revision 313496)
+--- sbin/geom/class/eli/geli.8	(revision 320320)
 +++ sbin/geom/class/eli/geli.8	(working copy)
 @@ -61,6 +61,7 @@
  .Op Fl l Ar keylen

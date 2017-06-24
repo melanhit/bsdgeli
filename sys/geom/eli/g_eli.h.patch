@@ -1,6 +1,6 @@
 Index: sys/geom/eli/g_eli.h
 ===================================================================
---- sys/geom/eli/g_eli.h	(revision 313496)
+--- sys/geom/eli/g_eli.h	(revision 320320)
 +++ sys/geom/eli/g_eli.h	(working copy)
 @@ -427,6 +427,12 @@
  		return (CRYPTO_3DES_CBC);

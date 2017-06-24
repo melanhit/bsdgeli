@@ -1,6 +1,6 @@
 Index: sbin/geom/class/eli/geom_eli.c
 ===================================================================
---- sbin/geom/class/eli/geom_eli.c	(revision 313496)
+--- sbin/geom/class/eli/geom_eli.c	(revision 320320)
 +++ sbin/geom/class/eli/geom_eli.c	(working copy)
 @@ -82,7 +82,7 @@
  /*

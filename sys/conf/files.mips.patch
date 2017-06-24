@@ -1,6 +1,6 @@
 Index: sys/conf/files.mips
 ===================================================================
---- sys/conf/files.mips	(revision 315705)
+--- sys/conf/files.mips	(revision 320320)
 +++ sys/conf/files.mips	(working copy)
 @@ -86,6 +86,7 @@
  	ipsec_support

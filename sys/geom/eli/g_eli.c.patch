@@ -1,6 +1,6 @@
 Index: sys/geom/eli/g_eli.c
 ===================================================================
---- sys/geom/eli/g_eli.c	(revision 313496)
+--- sys/geom/eli/g_eli.c	(revision 320320)
 +++ sys/geom/eli/g_eli.c	(working copy)
 @@ -983,6 +983,47 @@
  	}
