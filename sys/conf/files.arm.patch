@@ -1,8 +1,8 @@
 Index: sys/conf/files.arm
 ===================================================================
---- sys/conf/files.arm	(revision 320320)
+--- sys/conf/files.arm	(revision 329982)
 +++ sys/conf/files.arm	(working copy)
-@@ -110,6 +110,7 @@
+@@ -111,6 +111,7 @@
  cddl/dev/fbt/arm/fbt_isa.c				optional dtrace_fbt | dtraceall compile-with "${FBT_C}"
  crypto/blowfish/bf_enc.c	optional	crypto | ipsec | ipsec_support
  crypto/des/des_enc.c		optional	crypto | ipsec | ipsec_support | netsmb

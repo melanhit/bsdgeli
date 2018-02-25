@@ -1,6 +1,6 @@
 Index: sys/geom/eli/g_eli_crypto.c
 ===================================================================
---- sys/geom/eli/g_eli_crypto.c	(revision 320320)
+--- sys/geom/eli/g_eli_crypto.c	(revision 329982)
 +++ sys/geom/eli/g_eli_crypto.c	(working copy)
 @@ -40,6 +40,7 @@
  #include <assert.h>

@@ -1,6 +1,6 @@
 Index: sbin/geom/class/eli/geli.8
 ===================================================================
---- sbin/geom/class/eli/geli.8	(revision 320320)
+--- sbin/geom/class/eli/geli.8	(revision 329982)
 +++ sbin/geom/class/eli/geli.8	(working copy)
 @@ -61,6 +61,7 @@
  .Op Fl l Ar keylen
@@ -38,7 +38,7 @@ Index: sbin/geom/class/eli/geli.8
  Providers can be configured to automatically detach on last close
  (so users do not have to remember to detach providers after unmounting
  the file systems).
-@@ -286,6 +292,8 @@
+@@ -291,6 +297,8 @@
  .Nm AES-CBC ,
  .Nm Blowfish-CBC ,
  .Nm Camellia-CBC ,
@@ -47,7 +47,7 @@ Index: sbin/geom/class/eli/geli.8
  .Nm 3DES-CBC ,
  and
  .Nm NULL .
-@@ -340,6 +348,8 @@
+@@ -345,6 +353,8 @@
  .Em 128 ,
  192,
  256
@@ -56,7 +56,7 @@ Index: sbin/geom/class/eli/geli.8
  .It Nm Blowfish-CBC
  .Em 128
  + n * 32, for n=[0..10]
-@@ -377,6 +387,8 @@
+@@ -382,6 +392,8 @@
  section to find which metadata version is supported by which FreeBSD version.
  Note that using an older version of metadata may limit the number of
  features available.
@@ -65,7 +65,7 @@ Index: sbin/geom/class/eli/geli.8
  .El
  .It Cm attach
  Attach the given provider.
-@@ -423,6 +435,8 @@
+@@ -428,6 +440,8 @@
  .It Fl r
  Attach read-only provider.
  It will not be opened for writing.
@@ -74,7 +74,7 @@ Index: sbin/geom/class/eli/geli.8
  .El
  .It Cm detach
  Detach the given providers, which means remove the devfs entry
-@@ -935,6 +949,20 @@
+@@ -949,6 +963,20 @@
  geli_da1s3a_keyfile_name="/boot/keys/da1s3a.key"
  .Ed
  .Pp

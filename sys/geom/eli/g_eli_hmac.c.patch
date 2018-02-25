@@ -1,8 +1,8 @@
 Index: sys/geom/eli/g_eli_hmac.c
 ===================================================================
---- sys/geom/eli/g_eli_hmac.c	(revision 320320)
+--- sys/geom/eli/g_eli_hmac.c	(revision 329982)
 +++ sys/geom/eli/g_eli_hmac.c	(working copy)
-@@ -131,6 +131,7 @@
+@@ -136,6 +136,7 @@
  
  	switch (sc->sc_ealgo) {
  	case CRYPTO_AES_XTS:

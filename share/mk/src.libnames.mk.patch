@@ -1,6 +1,6 @@
 Index: share/mk/src.libnames.mk
 ===================================================================
---- share/mk/src.libnames.mk	(revision 320320)
+--- share/mk/src.libnames.mk	(revision 329982)
 +++ share/mk/src.libnames.mk	(working copy)
 @@ -160,6 +160,7 @@
  		tacplus \

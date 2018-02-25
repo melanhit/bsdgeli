@@ -1,6 +1,6 @@
 Index: sys/opencrypto/cryptodev.h
 ===================================================================
---- sys/opencrypto/cryptodev.h	(revision 320320)
+--- sys/opencrypto/cryptodev.h	(revision 329982)
 +++ sys/opencrypto/cryptodev.h	(working copy)
 @@ -118,7 +118,8 @@
  #define	AES_ICM_BLOCK_LEN	1

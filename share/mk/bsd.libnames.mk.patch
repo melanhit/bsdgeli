@@ -1,8 +1,8 @@
 Index: share/mk/bsd.libnames.mk
 ===================================================================
---- share/mk/bsd.libnames.mk	(revision 320320)
+--- share/mk/bsd.libnames.mk	(revision 329982)
 +++ share/mk/bsd.libnames.mk	(working copy)
-@@ -147,6 +147,7 @@
+@@ -146,6 +146,7 @@
  LIBTERMCAPW?=	${DESTDIR}${LIBDIR_BASE}/libtermcapw.a
  LIBTERMLIB?=	"don't use LIBTERMLIB, use LIBTERMCAP"
  LIBTINFO?=	"don't use LIBTINFO, use LIBNCURSES"

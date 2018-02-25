@@ -1,6 +1,6 @@
 Index: sys/opencrypto/cryptodev.c
 ===================================================================
---- sys/opencrypto/cryptodev.c	(revision 320320)
+--- sys/opencrypto/cryptodev.c	(revision 329982)
 +++ sys/opencrypto/cryptodev.c	(working copy)
 @@ -440,6 +440,12 @@
  		case CRYPTO_AES_NIST_GCM_16:

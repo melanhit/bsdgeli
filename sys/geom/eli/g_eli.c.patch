@@ -1,8 +1,8 @@
 Index: sys/geom/eli/g_eli.c
 ===================================================================
---- sys/geom/eli/g_eli.c	(revision 320320)
+--- sys/geom/eli/g_eli.c	(revision 329982)
 +++ sys/geom/eli/g_eli.c	(working copy)
-@@ -983,6 +983,47 @@
+@@ -1011,6 +1011,47 @@
  	}
  }
  
@@ -50,7 +50,7 @@ Index: sys/geom/eli/g_eli.c
  /*
   * Tasting is only made on boot.
   * We detect providers which should be attached before root is mounted.
-@@ -1006,9 +1047,11 @@
+@@ -1035,9 +1076,11 @@
  
  	G_ELI_DEBUG(3, "Tasting %s.", pp->name);
  

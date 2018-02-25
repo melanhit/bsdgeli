@@ -1,6 +1,6 @@
 Index: secure/lib/Makefile
 ===================================================================
---- secure/lib/Makefile	(revision 320320)
+--- secure/lib/Makefile	(revision 329982)
 +++ secure/lib/Makefile	(working copy)
 @@ -10,6 +10,8 @@
  .endif

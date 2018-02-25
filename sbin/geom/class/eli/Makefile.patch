@@ -1,6 +1,6 @@
 Index: sbin/geom/class/eli/Makefile
 ===================================================================
---- sbin/geom/class/eli/Makefile	(revision 320320)
+--- sbin/geom/class/eli/Makefile	(revision 329982)
 +++ sbin/geom/class/eli/Makefile	(working copy)
 @@ -11,7 +11,7 @@
  SRCS+=	sha256c.c

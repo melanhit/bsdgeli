@@ -1,6 +1,6 @@
 Index: sys/geom/eli/g_eli_key.c
 ===================================================================
---- sys/geom/eli/g_eli_key.c	(revision 320320)
+--- sys/geom/eli/g_eli_key.c	(revision 329982)
 +++ sys/geom/eli/g_eli_key.c	(working copy)
 @@ -226,6 +226,7 @@
  	 */
