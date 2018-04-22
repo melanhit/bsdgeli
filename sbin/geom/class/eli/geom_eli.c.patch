@@ -1,8 +1,28 @@
 Index: sbin/geom/class/eli/geom_eli.c
 ===================================================================
---- sbin/geom/class/eli/geom_eli.c	(revision 329982)
+--- sbin/geom/class/eli/geom_eli.c	(revision 332871)
 +++ sbin/geom/class/eli/geom_eli.c	(working copy)
-@@ -137,6 +137,7 @@
+@@ -84,9 +84,9 @@
+ /*
+  * Available commands:
+  *
+- * init [-bdgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] prov
++ * init [-bdgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] [-H header] prov
+  * label - alias for 'init'
+- * attach [-dprv] [-j passfile] [-k keyfile] prov
++ * attach [-dprv] [-j passfile] [-k keyfile] [-H header] prov
+  * detach [-fl] prov ...
+  * stop - alias for 'detach'
+  * onetime [-d] [-a aalgo] [-e ealgo] [-l keylen] prov
+@@ -120,6 +120,7 @@
+ 		{ 's', "sectorsize", "0", G_TYPE_NUMBER },
+ 		{ 'T', "notrim", NULL, G_TYPE_BOOL },
+ 		{ 'V', "mdversion", "-1", G_TYPE_NUMBER },
++		{ 'H', "header", "", G_TYPE_STRING },
+ 		G_OPT_SENTINEL
+ 	    },
+ 	    "[-bdgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] prov"
+@@ -139,6 +140,7 @@
  		{ 'P', "nonewpassphrase", NULL, G_TYPE_BOOL },
  		{ 's', "sectorsize", "0", G_TYPE_NUMBER },
  		{ 'V', "mdversion", "-1", G_TYPE_NUMBER },
@@ -10,19 +30,15 @@ Index: sbin/geom/class/eli/geom_eli.c
  		G_OPT_SENTINEL
  	    },
  	    "- an alias for 'init'"
-@@ -148,9 +149,10 @@
+@@ -150,6 +152,7 @@
  		{ 'k', "keyfile", G_VAL_OPTIONAL, G_TYPE_STRING | G_TYPE_MULTI },
  		{ 'p', "nopassphrase", NULL, G_TYPE_BOOL },
  		{ 'r', "readonly", NULL, G_TYPE_BOOL },
 +		{ 'H', "header", "", G_TYPE_STRING },
  		G_OPT_SENTINEL
  	    },
--	    "[-dprv] [-j passfile] [-k keyfile] prov"
-+	    "[-dprv] [-j passfile] [-k keyfile] [-H header] prov"
- 	},
- 	{ "detach", 0, NULL,
- 	    {
-@@ -637,7 +639,7 @@
+ 	    "[-dprv] [-j passfile] [-k keyfile] prov"
+@@ -639,7 +642,7 @@
  		int fd;
  
  		/* This is a file probably. */
@@ -31,11 +47,11 @@ Index: sbin/geom/class/eli/geom_eli.c
  		if (fd == -1) {
  			gctl_error(req, "Cannot open %s: %s.", prov,
  			    strerror(errno));
-@@ -670,10 +672,9 @@
+@@ -672,10 +675,9 @@
  eli_init(struct gctl_req *req)
  {
  	struct g_eli_metadata md;
--	unsigned char sector[sizeof(struct g_eli_metadata)];
+-	unsigned char sector[sizeof(struct g_eli_metadata)] __aligned(4);
  	unsigned char key[G_ELI_USERKEYLEN];
  	char backfile[MAXPATHLEN];
 -	const char *str, *prov;
@@ -43,7 +59,7 @@ Index: sbin/geom/class/eli/geom_eli.c
  	unsigned int secsize, version;
  	off_t mediasize;
  	intmax_t val;
-@@ -839,17 +840,26 @@
+@@ -841,17 +843,26 @@
  		return;
  	}
  
@@ -75,7 +91,7 @@ Index: sbin/geom/class/eli/geom_eli.c
  	/* Backup metadata to a file. */
  	str = gctl_get_ascii(req, "backupfile");
  	if (str[0] != '\0') {
-@@ -883,7 +893,7 @@
+@@ -885,7 +896,7 @@
  {
  	struct g_eli_metadata md;
  	unsigned char key[G_ELI_USERKEYLEN];
@@ -84,7 +100,7 @@ Index: sbin/geom/class/eli/geom_eli.c
  	off_t mediasize;
  	int nargs;
  
-@@ -893,8 +903,14 @@
+@@ -895,8 +906,14 @@
  		return;
  	}
  	prov = gctl_get_ascii(req, "arg0");
@@ -100,7 +116,7 @@ Index: sbin/geom/class/eli/geom_eli.c
  		return;
  
  	mediasize = g_get_mediasize(prov);
-@@ -908,6 +924,9 @@
+@@ -910,6 +927,9 @@
  		return;
  	}
  

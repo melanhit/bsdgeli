@@ -1,6 +1,6 @@
 Index: sys/conf/files.sparc64
 ===================================================================
---- sys/conf/files.sparc64	(revision 329982)
+--- sys/conf/files.sparc64	(revision 332871)
 +++ sys/conf/files.sparc64	(working copy)
 @@ -25,6 +25,7 @@
  cddl/contrib/opensolaris/common/atomic/sparc64/opensolaris_atomic.S	optional zfs compile-with "${ZFS_S}"

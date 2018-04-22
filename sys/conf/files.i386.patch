@@ -1,6 +1,6 @@
 Index: sys/conf/files.i386
 ===================================================================
---- sys/conf/files.i386	(revision 329982)
+--- sys/conf/files.i386	(revision 332871)
 +++ sys/conf/files.i386	(working copy)
 @@ -163,6 +163,7 @@
  crypto/via/padlock.c		optional padlock

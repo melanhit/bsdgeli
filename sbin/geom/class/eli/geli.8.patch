@@ -1,6 +1,6 @@
 Index: sbin/geom/class/eli/geli.8
 ===================================================================
---- sbin/geom/class/eli/geli.8	(revision 329982)
+--- sbin/geom/class/eli/geli.8	(revision 332871)
 +++ sbin/geom/class/eli/geli.8	(working copy)
 @@ -61,6 +61,7 @@
  .Op Fl l Ar keylen
@@ -43,7 +43,7 @@ Index: sbin/geom/class/eli/geli.8
  .Nm Blowfish-CBC ,
  .Nm Camellia-CBC ,
 +.Nm Threefish-CBC ,
-+.Nm Threefish-XTS
++.Nm Threefish-XTS ,
  .Nm 3DES-CBC ,
  and
  .Nm NULL .

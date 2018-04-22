@@ -1,6 +1,6 @@
 Index: sys/conf/files.pc98
 ===================================================================
---- sys/conf/files.pc98	(revision 329982)
+--- sys/conf/files.pc98	(revision 332871)
 +++ sys/conf/files.pc98	(working copy)
 @@ -95,6 +95,7 @@
  	compile-with	"${CC} -c -I$S/crypto/blowfish/arch/i386 ${ASM_CFLAGS} ${WERROR} ${.IMPSRC}" \

@@ -1,6 +1,6 @@
 Index: sbin/geom/class/eli/Makefile.depend
 ===================================================================
---- sbin/geom/class/eli/Makefile.depend	(revision 329982)
+--- sbin/geom/class/eli/Makefile.depend	(revision 332871)
 +++ sbin/geom/class/eli/Makefile.depend	(working copy)
 @@ -13,6 +13,7 @@
  	lib/libmd \

@@ -1,6 +1,6 @@
 Index: sys/modules/crypto/Makefile
 ===================================================================
---- sys/modules/crypto/Makefile	(revision 329982)
+--- sys/modules/crypto/Makefile	(revision 332871)
 +++ sys/modules/crypto/Makefile	(working copy)
 @@ -9,6 +9,7 @@
  .PATH:	${SRCTOP}/sys/crypto/sha2

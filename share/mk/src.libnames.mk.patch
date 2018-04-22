@@ -1,8 +1,8 @@
 Index: share/mk/src.libnames.mk
 ===================================================================
---- share/mk/src.libnames.mk	(revision 329982)
+--- share/mk/src.libnames.mk	(revision 332871)
 +++ share/mk/src.libnames.mk	(working copy)
-@@ -160,6 +160,7 @@
+@@ -161,6 +161,7 @@
  		tacplus \
  		termcap \
  		termcapw \
@@ -10,7 +10,7 @@ Index: share/mk/src.libnames.mk
  		ufs \
  		ugidfw \
  		ulog \
-@@ -534,6 +535,7 @@
+@@ -539,6 +540,7 @@
  LIBPANELDIR=	${OBJTOP}/lib/ncurses/panel
  LIBPANELWDIR=	${OBJTOP}/lib/ncurses/panelw
  LIBCRYPTODIR=	${OBJTOP}/secure/lib/libcrypto

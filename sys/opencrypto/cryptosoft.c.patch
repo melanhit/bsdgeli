@@ -1,6 +1,6 @@
 Index: sys/opencrypto/cryptosoft.c
 ===================================================================
---- sys/opencrypto/cryptosoft.c	(revision 329982)
+--- sys/opencrypto/cryptosoft.c	(revision 332871)
 +++ sys/opencrypto/cryptosoft.c	(working copy)
 @@ -802,6 +802,12 @@
  		case CRYPTO_CAMELLIA_CBC:

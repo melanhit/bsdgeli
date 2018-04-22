@@ -1,6 +1,6 @@
 Index: sys/geom/eli/g_eli_ctl.c
 ===================================================================
---- sys/geom/eli/g_eli_ctl.c	(revision 329982)
+--- sys/geom/eli/g_eli_ctl.c	(revision 332871)
 +++ sys/geom/eli/g_eli_ctl.c	(working copy)
 @@ -53,12 +53,12 @@
  static void
