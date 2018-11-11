@@ -1,8 +1,8 @@
 Index: sys/geom/eli/g_eli_crypto.c
 ===================================================================
---- sys/geom/eli/g_eli_crypto.c	(revision 332871)
+--- sys/geom/eli/g_eli_crypto.c	(revision 340349)
 +++ sys/geom/eli/g_eli_crypto.c	(working copy)
-@@ -40,6 +40,7 @@
+@@ -42,6 +42,7 @@
  #include <assert.h>
  #include <openssl/evp.h>
  #define	_OpenSSL_
@@ -10,54 +10,53 @@ Index: sys/geom/eli/g_eli_crypto.c
  #endif
  #include <geom/eli/g_eli.h>
  
-@@ -117,6 +118,21 @@
+@@ -119,6 +120,21 @@
  }
  #else	/* !_KERNEL */
  static int
 +threefish_ciph(int enc, const u_char *key, size_t keysize, u_char *data, size_t datasize)
 +{
-+	threefish_512_cbc_ctx ctx;
++    threefish_512_cbc_ctx ctx;
 +
-+	threefish_512_setkey_cbc(&ctx, key, keysize);
++    threefish_512_setkey_cbc(&ctx, key, keysize);
 +
-+	if(enc)
-+		threefish_512_encrypt_cbc(&ctx, data, datasize, data);
-+	else
-+		threefish_512_decrypt_cbc(&ctx, data, datasize, data);
++    if(enc)
++        threefish_512_encrypt_cbc(&ctx, data, datasize, data);
++    else
++        threefish_512_decrypt_cbc(&ctx, data, datasize, data);
 +
-+	return (0);
++    return (0);
 +}
 +
 +static int
  g_eli_crypto_cipher(u_int algo, int enc, u_char *data, size_t datasize,
      const u_char *key, size_t keysize)
  {
-@@ -169,6 +185,8 @@
+@@ -171,6 +187,8 @@
  	case CRYPTO_3DES_CBC:
  		type = EVP_des_ede3_cbc();
  		break;
-+	case CRYPTO_THREEFISH_CBC:
-+		return threefish_ciph(enc, key, keysize, data, datasize);
++    case CRYPTO_THREEFISH_CBC:
++        return threefish_ciph(enc, key, keysize, data, datasize);
  	default:
  		return (EINVAL);
  	}
-@@ -207,6 +225,9 @@
+@@ -211,6 +229,9 @@
  	if (algo == CRYPTO_AES_XTS)
  		algo = CRYPTO_AES_CBC;
  
-+	if (algo == CRYPTO_THREEFISH_XTS)
-+		algo = CRYPTO_THREEFISH_CBC;
++    if (algo == CRYPTO_THREEFISH_XTS)
++        algo = CRYPTO_THREEFISH_CBC;
 +
  	return (g_eli_crypto_cipher(algo, 1, data, datasize, key, keysize));
  }
  
-@@ -218,6 +239,9 @@
- 	/* We prefer AES-CBC for metadata protection. */
+@@ -223,5 +244,8 @@
  	if (algo == CRYPTO_AES_XTS)
  		algo = CRYPTO_AES_CBC;
-+	
-+	if (algo == CRYPTO_THREEFISH_XTS)
-+		algo = CRYPTO_THREEFISH_CBC;
  
++    if (algo == CRYPTO_THREEFISH_XTS)
++        algo = CRYPTO_THREEFISH_CBC;
++
  	return (g_eli_crypto_cipher(algo, 0, data, datasize, key, keysize));
  }

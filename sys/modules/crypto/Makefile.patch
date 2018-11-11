@@ -1,25 +1,25 @@
 Index: sys/modules/crypto/Makefile
 ===================================================================
---- sys/modules/crypto/Makefile	(revision 332871)
+--- sys/modules/crypto/Makefile	(revision 340349)
 +++ sys/modules/crypto/Makefile	(working copy)
-@@ -9,6 +9,7 @@
- .PATH:	${SRCTOP}/sys/crypto/sha2
- .PATH:	${SRCTOP}/sys/crypto/siphash
+@@ -13,6 +13,7 @@
  .PATH:	${SRCTOP}/sys/crypto/skein
-+.PATH:	${SRCTOP}/sys/crypto/threefish
- 
- KMOD	= crypto
- SRCS	= crypto.c cryptodev_if.c
-@@ -19,6 +20,12 @@
+ .PATH:	${SRCTOP}/sys/crypto/blake2
+ .PATH:	${SRCTOP}/sys/crypto/chacha20
++.PATH:  ${SRCTOP}/sys/crypto/threefish
+ .PATH:	${SRCTOP}/sys/contrib/libb2
+ .PATH:	${LIBSODIUM}/crypto_onetimeauth/poly1305
+ .PATH:	${LIBSODIUM}/crypto_onetimeauth/poly1305/donna
+@@ -28,6 +29,12 @@
  SRCS	+= des_ecb.c des_enc.c des_setkey.c
  SRCS	+= sha1.c sha256c.c sha512c.c
  SRCS	+= skein.c skein_block.c
 +.if exists(${MACHINE_ARCH}/threefish_512.S)
-+.PATH:	${.CURDIR}/../../crypto/threefish/${MACHINE_ARCH}
-+SRCS	+= threefish_512.S
++.PATH: ${.CURDIR}/../../crypto/threefish/${MACHINE_ARCH}
++SRCS   += threefish_512.S
 +.else
-+SRCS	+= threefish.c
++SRCS   += threefish.c
 +.endif
+ # unroll the 256 and 512 loops, half unroll the 1024
+ CFLAGS+= -DSKEIN_LOOP=995
  .if exists(${MACHINE_ARCH}/skein_block_asm.s)
- .PATH:	${SRCTOP}/sys/crypto/skein/${MACHINE_ARCH}
- SRCS	+= skein_block_asm.s

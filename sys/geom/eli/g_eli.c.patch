@@ -1,67 +1,76 @@
 Index: sys/geom/eli/g_eli.c
 ===================================================================
---- sys/geom/eli/g_eli.c	(revision 332871)
+--- sys/geom/eli/g_eli.c	(revision 340349)
 +++ sys/geom/eli/g_eli.c	(working copy)
-@@ -1024,6 +1024,47 @@
+@@ -215,7 +215,7 @@
+ static void
+ g_eli_getattr_done(struct bio *bp)
+ {
+-	if (bp->bio_error == 0 && 
++	if (bp->bio_error == 0 &&
+ 	    !strcmp(bp->bio_attribute, "GEOM::physpath")) {
+ 		strlcat(bp->bio_data, "/eli", bp->bio_length);
+ 	}
+@@ -1028,6 +1028,47 @@
  	}
  }
  
 +static int
 +g_eli_header_load(struct g_eli_metadata *md, const char *provider)
 +{
-+	unsigned char *headfile, *data;
-+	char *file, name[64];
-+	size_t size;
++    unsigned char *headfile, *data;
++    char *file, name[64];
++    size_t size;
 +
-+	snprintf(name, sizeof(name), "%s:geli_header", provider);
-+	headfile = preload_search_by_type(name);
-+	if (headfile == NULL)
-+		return (1);
++    snprintf(name, sizeof(name), "%s:geli_header", provider);
++    headfile = preload_search_by_type(name);
++    if (headfile == NULL)
++        return (1);
 +
-+	data = preload_fetch_addr(headfile);
-+	if (data == NULL) {
-+		G_ELI_DEBUG(0, "Cannot find header file data for %s.",
-+					name);
-+		return (1);
-+	}
++    data = preload_fetch_addr(headfile);
++    if (data == NULL) {
++        G_ELI_DEBUG(0, "Cannot find header file data for %s.",
++                name);
++        return (1);
++    }
 +
-+	size = preload_fetch_size(headfile);
-+	if (size == 0) {
-+		G_ELI_DEBUG(0, "Cannot find header file size for %s.",
-+					name);
-+		return (1);
-+	}
++    size = preload_fetch_size(headfile);
++    if (size == 0) {
++        G_ELI_DEBUG(0, "Cannot find header file size for %s.",
++                name);
++        return (1);
++    }
 +
-+	file = preload_search_info(headfile, MODINFO_NAME);
-+	if (file == NULL) {
-+		G_ELI_DEBUG(0, "Cannot find header file name for %s.",
-+					 name);
-+		return (1);
-+	}
++    file = preload_search_info(headfile, MODINFO_NAME);
++    if (file == NULL) {
++        G_ELI_DEBUG(0, "Cannot find header file name for %s.",
++                name);
++        return (1);
++    }
 +
-+	G_ELI_DEBUG(1, "Loaded header %s for %s (type: %s).", file,
-+					provider, name);
++    G_ELI_DEBUG(1, "Loaded header %s for %s (type: %s).", file,
++            provider, name);
 +
-+	eli_metadata_decode(data, md);
++    eli_metadata_decode(data, md);
 +
-+	return (0);
++    return (0);
 +}
 +
  /*
   * Tasting is only made on boot.
   * We detect providers which should be attached before root is mounted.
-@@ -1048,9 +1089,11 @@
+@@ -1052,9 +1093,11 @@
  
  	G_ELI_DEBUG(3, "Tasting %s.", pp->name);
  
 -	error = g_eli_read_metadata(mp, pp, &md);
 -	if (error != 0)
 -		return (NULL);
-+	if(g_eli_header_load(&md, pp->name) != 0) {
-+		error = g_eli_read_metadata(mp, pp, &md);
-+		if (error != 0)
-+			return (NULL);
-+	}
++    if(g_eli_header_load(&md, pp->name) != 0) {
++	    error = g_eli_read_metadata(mp, pp, &md);
++	    if (error != 0)
++		    return (NULL);
++    }
  	gp = NULL;
  
  	if (strcmp(md.md_magic, G_ELI_MAGIC) != 0)

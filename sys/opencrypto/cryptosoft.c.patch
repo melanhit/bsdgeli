@@ -1,44 +1,44 @@
 Index: sys/opencrypto/cryptosoft.c
 ===================================================================
---- sys/opencrypto/cryptosoft.c	(revision 332871)
+--- sys/opencrypto/cryptosoft.c	(revision 340349)
 +++ sys/opencrypto/cryptosoft.c	(working copy)
-@@ -802,6 +802,12 @@
- 		case CRYPTO_CAMELLIA_CBC:
- 			txf = &enc_xform_camellia;
+@@ -812,6 +812,12 @@
+ 		case CRYPTO_CHACHA20:
+ 			txf = &enc_xform_chacha20;
  			goto enccommon;
-+		case CRYPTO_THREEFISH_CBC:
-+			txf = &enc_xform_threefish;
-+			goto enccommon;
-+		case CRYPTO_THREEFISH_XTS:
-+			txf = &enc_xform_threefish_xts;
-+			goto enccommon;
- 		case CRYPTO_NULL_CBC:
- 			txf = &enc_xform_null;
- 			goto enccommon;
-@@ -1012,6 +1018,8 @@
- 		case CRYPTO_AES_NIST_GCM_16:
- 		case CRYPTO_AES_NIST_GMAC:
++        case CRYPTO_THREEFISH_CBC:
++            txf = &enc_xform_threefish;
++            goto enccommon;
++        case CRYPTO_THREEFISH_XTS:
++            txf = &enc_xform_threefish_xts;
++            goto enccommon;
+ 		enccommon:
+ 			if (cri->cri_key != NULL) {
+ 				error = txf->setkey(&swd->sw_kschedule,
+@@ -1042,6 +1048,8 @@
  		case CRYPTO_CAMELLIA_CBC:
-+		case CRYPTO_THREEFISH_CBC:
-+		case CRYPTO_THREEFISH_XTS:
  		case CRYPTO_NULL_CBC:
+ 		case CRYPTO_CHACHA20:
++        case CRYPTO_THREEFISH_CBC:
++        case CRYPTO_THREEFISH_XTS:
  			txf = swd->sw_exf;
  
-@@ -1138,6 +1146,8 @@
- 		case CRYPTO_AES_XTS:
+ 			if (swd->sw_kschedule)
+@@ -1162,6 +1170,8 @@
  		case CRYPTO_AES_ICM:
  		case CRYPTO_CAMELLIA_CBC:
-+		case CRYPTO_THREEFISH_CBC:
-+		case CRYPTO_THREEFISH_XTS:
+ 		case CRYPTO_CHACHA20:
++        case CRYPTO_THREEFISH_CBC:
++        case CRYPTO_THREEFISH_XTS:
  			if ((crp->crp_etype = swcr_encdec(crd, sw,
  			    crp->crp_buf, crp->crp_flags)) != 0)
  				goto done;
-@@ -1246,6 +1256,8 @@
- 	REGISTER(CRYPTO_AES_192_NIST_GMAC);
- 	REGISTER(CRYPTO_AES_256_NIST_GMAC);
-  	REGISTER(CRYPTO_CAMELLIA_CBC);
-+ 	REGISTER(CRYPTO_THREEFISH_CBC);
-+ 	REGISTER(CRYPTO_THREEFISH_XTS);
- 	REGISTER(CRYPTO_DEFLATE_COMP);
+@@ -1289,6 +1299,8 @@
+ 	REGISTER(CRYPTO_BLAKE2S);
+ 	REGISTER(CRYPTO_CHACHA20);
+ 	REGISTER(CRYPTO_POLY1305);
++    REGISTER(CRYPTO_THREEFISH_CBC);
++    REGISTER(CRYPTO_THREEFISH_XTS);
  #undef REGISTER
  
+ 	return 0;

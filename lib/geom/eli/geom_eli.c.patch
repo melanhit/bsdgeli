@@ -1,0 +1,155 @@
+Index: lib/geom/eli/geom_eli.c
+===================================================================
+--- lib/geom/eli/geom_eli.c	(revision 340349)
++++ lib/geom/eli/geom_eli.c	(working copy)
+@@ -127,9 +127,10 @@
+ 		{ 's', "sectorsize", "0", G_TYPE_NUMBER },
+ 		{ 'T', "notrim", NULL, G_TYPE_BOOL },
+ 		{ 'V', "mdversion", "-1", G_TYPE_NUMBER },
++        { 'H', "header", "", G_TYPE_STRING },
+ 		G_OPT_SENTINEL
+ 	    },
+-	    "[-bdgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] prov ..."
++	    "[-bdgPTv] [-a aalgo] [-B backupfile] [-e ealgo] [-i iterations] [-l keylen] [-J newpassfile] [-K newkeyfile] [-s sectorsize] [-V version] [-H header] prov ..."
+ 	},
+ 	{ "label", G_FLAG_VERBOSE, eli_main,
+ 	    {
+@@ -146,6 +147,7 @@
+ 		{ 'P', "nonewpassphrase", NULL, G_TYPE_BOOL },
+ 		{ 's', "sectorsize", "0", G_TYPE_NUMBER },
+ 		{ 'V', "mdversion", "-1", G_TYPE_NUMBER },
++        { 'H', "header", "", G_TYPE_STRING },
+ 		G_OPT_SENTINEL
+ 	    },
+ 	    "- an alias for 'init'"
+@@ -159,9 +161,10 @@
+ 		{ 'n', "keyno", "-1", G_TYPE_NUMBER },
+ 		{ 'p', "nopassphrase", NULL, G_TYPE_BOOL },
+ 		{ 'r', "readonly", NULL, G_TYPE_BOOL },
++        { 'H', "header", "", G_TYPE_STRING },
+ 		G_OPT_SENTINEL
+ 	    },
+-	    "[-Cdprv] [-n keyno] [-j passfile] [-k keyfile] prov ..."
++	    "[-Cdprv] [-n keyno] [-j passfile] [-k keyfile] [-H header] prov ..."
+ 	},
+ 	{ "detach", 0, NULL,
+ 	    {
+@@ -662,7 +665,7 @@
+ 		int fd;
+ 
+ 		/* This is a file probably. */
+-		fd = open(prov, O_WRONLY | O_TRUNC);
++		fd = open(prov, O_WRONLY | O_TRUNC | O_CREAT, 0600);
+ 		if (fd == -1) {
+ 			gctl_error(req, "Cannot open %s: %s.", prov,
+ 			    strerror(errno));
+@@ -696,10 +699,9 @@
+ {
+ 	struct g_eli_metadata md;
+ 	struct gctl_req *r;
+-	unsigned char sector[sizeof(struct g_eli_metadata)] __aligned(4);
+ 	unsigned char key[G_ELI_USERKEYLEN];
+ 	char backfile[MAXPATHLEN];
+-	const char *str, *prov;
++	const char *str, *prov, *hdname;
+ 	unsigned int secsize, version;
+ 	off_t mediasize;
+ 	intmax_t val;
+@@ -894,19 +896,23 @@
+ 			goto out;
+ 		}
+ 
+-		/* Convert metadata to on-disk format. */
+-		eli_metadata_encode(&md, sector);
++        hdname = gctl_get_ascii(req, "header");
++        if (*hdname == '\0')
++            str = prov;
++        else
++            str = hdname;
+ 
+ 		/* Store metadata to disk. */
+-		error = g_metadata_store(prov, sector, sizeof(sector));
+-		if (error != 0) {
+-			gctl_error(r, "Cannot store metadata on %s: %s.", prov,
+-			    strerror(error));
++		error = eli_metadata_store(r, str, &md);
++		if (error != 0)
+ 			goto out;
+-		}
++
+ 		if (verbose)
+-			printf("Metadata value stored on %s.\n", prov);
++			printf("Metadata value stored on %s.\n", str);
+ 
++        if (*hdname != '\0')
++            goto out;
++
+ 		/* Backup metadata to a file. */
+ 		const char *p = prov;
+ 		unsigned int j;
+@@ -992,11 +998,13 @@
+ 		 * Erase sensitive and provider specific data from memory.
+ 		 */
+ 		explicit_bzero(key, sizeof(key));
+-		explicit_bzero(sector, sizeof(sector));
+ 		explicit_bzero(&md.md_provsize, sizeof(md.md_provsize));
+ 		explicit_bzero(&md.md_sectorsize, sizeof(md.md_sectorsize));
+ 		explicit_bzero(&md.md_salt, sizeof(md.md_salt));
+ 		explicit_bzero(&md.md_mkeys, sizeof(md.md_mkeys));
++        
++        if (*hdname != '\0')
++            break;
+ 	}
+ 
+ 	/* Clear the cached metadata, including keys. */
+@@ -1008,7 +1016,7 @@
+ {
+ 	struct g_eli_metadata md;
+ 	struct gctl_req *r;
+-	const char *prov;
++	const char *str, *prov, *hdname;
+ 	off_t mediasize;
+ 	int i, nargs, nparams, param;
+ 	const int one = 1;
+@@ -1027,6 +1035,8 @@
+ 	 */
+ 	nparams = req->narg - nargs - 1;
+ 
++    hdname = gctl_get_ascii(req, "header");
++
+ 	/* Create new child request for each provider and issue to kernel */
+ 	for (i = 0; i < nargs; i++) {
+ 		r = gctl_get_handle();
+@@ -1042,7 +1052,12 @@
+ 		prov = gctl_get_ascii(req, "arg%d", i);
+ 		gctl_ro_param(r, "arg0", -1, prov);
+ 
+-		if (eli_metadata_read(r, prov, &md) == -1) {
++        if(*hdname == '\0')
++            str = prov;
++        else
++            str = hdname;
++
++		if (eli_metadata_read(r, str, &md) == -1) {
+ 			/*
+ 			 * Error reading metadata - details added to geom
+ 			 * request by eli_metadata_read().
+@@ -1065,6 +1080,8 @@
+ 		}
+ 
+ 		gctl_ro_param(r, "key", sizeof(key), key);
++        if (*hdname != '\0')
++            gctl_ro_param(r, "hd", sizeof(md), &md);
+ 
+ 		if (gctl_issue(r) == NULL) {
+ 			if (verbose)
+@@ -1086,6 +1103,9 @@
+ 
+ 		/* Clear sensitive data from memory. */
+ 		explicit_bzero(key, sizeof(key));
++
++        if (*hdname != '\0')
++            break;
+ 	}
+ 
+ 	/* Clear sensitive data from memory. */

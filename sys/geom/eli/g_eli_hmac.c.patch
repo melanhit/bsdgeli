@@ -1,12 +1,12 @@
 Index: sys/geom/eli/g_eli_hmac.c
 ===================================================================
---- sys/geom/eli/g_eli_hmac.c	(revision 332871)
+--- sys/geom/eli/g_eli_hmac.c	(revision 340349)
 +++ sys/geom/eli/g_eli_hmac.c	(working copy)
 @@ -136,6 +136,7 @@
  
  	switch (sc->sc_ealgo) {
  	case CRYPTO_AES_XTS:
-+	case CRYPTO_THREEFISH_XTS:
++    case CRYPTO_THREEFISH_XTS:
  		bcopy(off, iv, sizeof(off));
  		bzero(iv + sizeof(off), size - sizeof(off));
  		break;

@@ -2,7 +2,7 @@ Index: secure/lib/libthreefish/Makefile
 ===================================================================
 --- secure/lib/libthreefish/Makefile	(nonexistent)
 +++ secure/lib/libthreefish/Makefile	(working copy)
-@@ -0,0 +1,16 @@
+@@ -0,0 +1,14 @@
 +PACKAGE=    threefish
 +LIB=        threefish
 +SHLIB_MAJOR=1
@@ -13,8 +13,6 @@ Index: secure/lib/libthreefish/Makefile
 +
 +SRCS=   threefish_512.c
 +INCS=   threefish.h
-+
-+PACKAGE=threefish
 +
 +CFLAGS+=-I${.CURDIR}
 +

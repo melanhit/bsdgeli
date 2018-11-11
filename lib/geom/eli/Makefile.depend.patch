@@ -1,0 +1,12 @@
+Index: lib/geom/eli/Makefile.depend
+===================================================================
+--- lib/geom/eli/Makefile.depend	(revision 340349)
++++ lib/geom/eli/Makefile.depend	(working copy)
+@@ -12,6 +12,7 @@
+ 	lib/libmd \
+ 	sbin/geom/core \
+ 	secure/lib/libcrypto \
++    secure/lib/libthreefish \
+ 
+ 
+ .include <dirdeps.mk>

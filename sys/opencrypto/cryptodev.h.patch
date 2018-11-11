@@ -1,34 +1,34 @@
 Index: sys/opencrypto/cryptodev.h
 ===================================================================
---- sys/opencrypto/cryptodev.h	(revision 332871)
+--- sys/opencrypto/cryptodev.h	(revision 340349)
 +++ sys/opencrypto/cryptodev.h	(working copy)
-@@ -118,7 +118,8 @@
- #define	AES_ICM_BLOCK_LEN	1
+@@ -123,7 +123,8 @@
  #define	ARC4_BLOCK_LEN		1
  #define	CAMELLIA_BLOCK_LEN	16
--#define	EALG_MAX_BLOCK_LEN	AES_BLOCK_LEN /* Keep this updated */
-+#define THREEFISH_BLOCK_LEN	64
+ #define	CHACHA20_NATIVE_BLOCK_LEN	64
+-#define	EALG_MAX_BLOCK_LEN	CHACHA20_NATIVE_BLOCK_LEN /* Keep this updated */
++#define THREEFISH_BLOCK_LEN    64
 +#define	EALG_MAX_BLOCK_LEN	THREEFISH_BLOCK_LEN /* Keep this updated */
  
  /* IV Lengths */
  
-@@ -150,6 +151,8 @@
+@@ -155,6 +156,8 @@
  #define	ARC4_MAX_KEY		32
  #define	CAMELLIA_MIN_KEY	8
  #define	CAMELLIA_MAX_KEY	32
-+#define	THREEFISH_MIN_KEY	64
-+#define	THREEFISH_MAX_KEY	THREEFISH_MIN_KEY
++#define THREEFISH_MIN_KEY   64
++#define THREEFISH_MAX_KEY   THREEFISH_MIN_KEY
  
  /* Maximum hash algorithm result length */
  #define	AALG_MAX_RESULT_LEN	64 /* Keep this updated */
-@@ -184,7 +187,9 @@
- #define	CRYPTO_AES_128_NIST_GMAC 26 /* auth side */
- #define	CRYPTO_AES_192_NIST_GMAC 27 /* auth side */
- #define	CRYPTO_AES_256_NIST_GMAC 28 /* auth side */
--#define	CRYPTO_ALGORITHM_MAX	28 /* Keep updated - see below */
-+#define CRYPTO_THREEFISH_CBC	29
-+#define CRYPTO_THREEFISH_XTS	30
-+#define	CRYPTO_ALGORITHM_MAX	30 /* Keep updated - see below */
+@@ -199,7 +202,9 @@
+ #define	CRYPTO_SHA2_384		36
+ #define	CRYPTO_SHA2_512		37
+ #define	CRYPTO_POLY1305		38
+-#define	CRYPTO_ALGORITHM_MAX	38 /* Keep updated - see below */
++#define CRYPTO_THREEFISH_CBC 39
++#define CRYPTO_THREEFISH_XTS 40
++#define	CRYPTO_ALGORITHM_MAX	40 /* Keep updated - see below */
  
  #define	CRYPTO_ALGO_VALID(x)	((x) >= CRYPTO_ALGORITHM_MIN && \
  				 (x) <= CRYPTO_ALGORITHM_MAX)

@@ -1,6 +1,6 @@
 Index: sys/opencrypto/xform.c
 ===================================================================
---- sys/opencrypto/xform.c	(revision 332871)
+--- sys/opencrypto/xform.c	(revision 340349)
 +++ sys/opencrypto/xform.c	(working copy)
 @@ -64,6 +64,7 @@
  #include <crypto/rijndael/rijndael.h>

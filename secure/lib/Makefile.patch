@@ -1,6 +1,6 @@
 Index: secure/lib/Makefile
 ===================================================================
---- secure/lib/Makefile	(revision 332871)
+--- secure/lib/Makefile	(revision 340349)
 +++ secure/lib/Makefile	(working copy)
 @@ -10,6 +10,8 @@
  .endif
@@ -8,6 +8,6 @@ Index: secure/lib/Makefile
  
 +SUBDIR+=libthreefish
 +
- .if ${MK_TESTS} != "no"
- SUBDIR+=tests
- .endif
+ SUBDIR.${MK_TESTS}+= tests
+ 
+ .include <bsd.subdir.mk>
