@@ -1,6 +1,6 @@
 Index: sys/opencrypto/xform_enc.h
 ===================================================================
---- sys/opencrypto/xform_enc.h	(revision 345236)
+--- sys/opencrypto/xform_enc.h	(revision 345238)
 +++ sys/opencrypto/xform_enc.h	(working copy)
 @@ -37,6 +37,7 @@
  #include <crypto/des/des.h>
@@ -26,6 +26,6 @@ Index: sys/opencrypto/xform_enc.h
 +struct threefish_xts_ctx {
 +    threefish_ctx st;
 +    u_int64_t tweak[2];
-+}
++};
 +
  #endif /* _CRYPTO_XFORM_ENC_H_ */
