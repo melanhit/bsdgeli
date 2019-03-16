@@ -1,10 +1,10 @@
 Index: sys/opencrypto/cryptodev.c
 ===================================================================
---- sys/opencrypto/cryptodev.c	(revision 340349)
+--- sys/opencrypto/cryptodev.c	(revision 345236)
 +++ sys/opencrypto/cryptodev.c	(working copy)
-@@ -444,6 +444,12 @@
- 		case CRYPTO_CHACHA20:
- 			txform = &enc_xform_chacha20;
+@@ -447,6 +447,12 @@
+ 		case CRYPTO_AES_CCM_16:
+ 			txform = &enc_xform_ccm;
  			break;
 +        case CRYPTO_THREEFISH_CBC:
 +            txform = &enc_xform_threefish;

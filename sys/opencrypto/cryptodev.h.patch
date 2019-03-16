@@ -1,18 +1,18 @@
 Index: sys/opencrypto/cryptodev.h
 ===================================================================
---- sys/opencrypto/cryptodev.h	(revision 340572)
+--- sys/opencrypto/cryptodev.h	(revision 345236)
 +++ sys/opencrypto/cryptodev.h	(working copy)
-@@ -123,7 +123,8 @@
+@@ -127,7 +127,8 @@
  #define	ARC4_BLOCK_LEN		1
  #define	CAMELLIA_BLOCK_LEN	16
  #define	CHACHA20_NATIVE_BLOCK_LEN	64
 -#define	EALG_MAX_BLOCK_LEN	CHACHA20_NATIVE_BLOCK_LEN /* Keep this updated */
-+#define THREEFISH_BLOCK_LEN    64
++#define THREEFISH_BLOCK_LEN 64
 +#define	EALG_MAX_BLOCK_LEN	THREEFISH_BLOCK_LEN /* Keep this updated */
  
  /* IV Lengths */
  
-@@ -155,6 +156,8 @@
+@@ -160,6 +161,8 @@
  #define	ARC4_MAX_KEY		32
  #define	CAMELLIA_MIN_KEY	8
  #define	CAMELLIA_MAX_KEY	32
@@ -21,34 +21,14 @@ Index: sys/opencrypto/cryptodev.h
  
  /* Maximum hash algorithm result length */
  #define	AALG_MAX_RESULT_LEN	64 /* Keep this updated */
-@@ -189,17 +192,19 @@
- #define	CRYPTO_AES_128_NIST_GMAC 26 /* auth side */
- #define	CRYPTO_AES_192_NIST_GMAC 27 /* auth side */
- #define	CRYPTO_AES_256_NIST_GMAC 28 /* auth side */
--#define	CRYPTO_BLAKE2B		29 /* Blake2b hash */
--#define	CRYPTO_BLAKE2S		30 /* Blake2s hash */
--#define	CRYPTO_CHACHA20		31 /* Chacha20 stream cipher */
--#define	CRYPTO_SHA2_224_HMAC	32
--#define	CRYPTO_RIPEMD160	33
--#define	CRYPTO_SHA2_224		34
--#define	CRYPTO_SHA2_256		35
--#define	CRYPTO_SHA2_384		36
--#define	CRYPTO_SHA2_512		37
--#define	CRYPTO_POLY1305		38
--#define	CRYPTO_ALGORITHM_MAX	38 /* Keep updated - see below */
-+#define CRYPTO_THREEFISH_CBC 29
-+#define CRYPTO_THREEFISH_XTS 30
-+#define	CRYPTO_BLAKE2B		31 /* Blake2b hash */
-+#define	CRYPTO_BLAKE2S		32 /* Blake2s hash */
-+#define	CRYPTO_CHACHA20		33 /* Chacha20 stream cipher */
-+#define	CRYPTO_SHA2_224_HMAC	34
-+#define	CRYPTO_RIPEMD160	35
-+#define	CRYPTO_SHA2_224		36
-+#define	CRYPTO_SHA2_256		37
-+#define	CRYPTO_SHA2_384		38
-+#define	CRYPTO_SHA2_512		39
-+#define	CRYPTO_POLY1305		40
-+#define	CRYPTO_ALGORITHM_MAX	40 /* Keep updated - see below */
+@@ -206,7 +209,9 @@
+ #define	CRYPTO_POLY1305		38
+ #define	CRYPTO_AES_CCM_CBC_MAC	39	/* auth side */
+ #define	CRYPTO_AES_CCM_16	40	/* cipher side */
+-#define	CRYPTO_ALGORITHM_MAX	40	/* Keep updated - see below */
++#define CRYPTO_THREEFISH_CBC    41
++#define CRYPTO_THREEFISH_XTS    42
++#define	CRYPTO_ALGORITHM_MAX	42	/* Keep updated - see below */
  
  #define	CRYPTO_ALGO_VALID(x)	((x) >= CRYPTO_ALGORITHM_MIN && \
  				 (x) <= CRYPTO_ALGORITHM_MAX)
